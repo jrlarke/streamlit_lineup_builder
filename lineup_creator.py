@@ -84,7 +84,7 @@ class Formater(object):
                 #count_2 = temp_list.count(self.ufc["group_num_2"])
                 #count_3 = temp_list.count(self.ufc["group_num_3"])
                 if (count_1 >= self.ufc["amount_num_1"]):
-                    df = df.append(temp_series)
+                    df = df._append(temp_series)
         if len(df) > 0:
             self.df = df[self.ufc['column_order']]
         else:
@@ -169,10 +169,9 @@ def run_creator_app():
         out = my_combine.combine()
 
         st.write("Came back with {} combinations".format(len(out)))
-        out_filtered = out.head(100)
 
         if st.button("Download Data as CSV"):
-            tmp_download_link = download_link(out_filtered, 'YOUR_DF.csv', 'Click here to download your data!')
+            tmp_download_link = download_link(out, 'YOUR_DF.csv', 'Click here to download your data!')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
         ufc = None
         returnedDf = None
