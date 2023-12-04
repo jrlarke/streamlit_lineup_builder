@@ -4,6 +4,7 @@ import itertools as it
 import base64
 from functools import reduce
 
+# Configurations
 MMA_DK = {
     "group_size" : 6,
     "main_key" : "Name + ID",
@@ -34,6 +35,8 @@ ufc_groups = {
                 '0 Group','1 Group','2 Group','3 Group','4 Group','5 Group',
                 'DK Total Salary']
 }
+
+# end Configurations
 
 class Formater(object):
     """
@@ -127,7 +130,7 @@ class Combinations(object):
             results.append(items)
 
         return pd.DataFrame(results)
-        
+
 def download_link(object_to_download, download_filename, download_link_text):
     """
     Generates a link to download the given object_to_download.
@@ -151,17 +154,14 @@ def download_link(object_to_download, download_filename, download_link_text):
 
 def run_creator_app():
     st.subheader('Choose a CSV to upload')
+    st.write('Version 0.0.1')
     st.write('For MMA required fields are: Name + ID, Salary, Fight, Group')
 
     uploaded_file = st.file_uploader("Choose a file", type=['csv'])
 
     if uploaded_file is not None:
-        #st.write(type(uploaded_file))
-        #file_details = {"filename":uploaded_file.name, "filetype":uploaded_file.type, "filesize":uploaded_file.size}
-        #st.write(file_details)
+
         df = pd.read_csv(uploaded_file)
-        ### would like to make this editable to allow user to change groups and rerun combinations ###
-        ### st.dataframe(df)
 
         choice = MMA_DK
         my_combine = Combinations(df, choice)
