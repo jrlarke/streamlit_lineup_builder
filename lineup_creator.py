@@ -4,43 +4,36 @@ import itertools as it
 import base64
 from functools import reduce
 
-class Combinations(object):
-    """
-    Creates different combinations using data in a dataframe
-    """
-    def __init__(self, dataframe, choice):
-        self.dataframe = dataframe
-        self.choice = choice
-        self.group_size = choice['group_size']
-        self.main_key = choice['main_key']
-        self.keys = choice['keys']
+MMA_DK = {
+    "group_size" : 6,
+    "main_key" : "Name + ID",
+    "keys" : ["Salary", "Fight", "Group"],
+    "columns": {6: '0 Salary', 7: '1 Salary', 8: '2 Salary',
+                9: '3 Salary', 10: '4 Salary', 11: '5 Salary',
+                12: '0 Fight', 13: '1 Fight', 14: '2 Fight',
+                15: '3 Fight', 16: '4 Fight', 17: '5 Fight',
+                18: '0 Group', 19: '1 Group', 20: '2 Group',
+                21: '3 Group', 22: '4 Group', 23: '5 Group'
+                },
+    "extra_columns":[('DK Total Salary', 'Salary')],
+    "filters":[('DK Total Salary', 50000, 'le'), ('DK Total Salary', 49500, 'ge')],
+    "sort": 'DK Total Salary',
+    "isUFC": True
+    }
 
-    def _build_maps(self):
-        out_dict = {}
-        for key in self.keys:
-            temp_dict = {}
-            for index, row in enumerate(self.dataframe[self.main_key]):
-                temp_dict.update({row: self.dataframe[key][index]})
-            out_dict.update({key: temp_dict})
-        return out_dict
-
-    def combine(self):
-        results = []
-        data_maps = self._build_maps()
-        for  item in it.combinations(self.dataframe[self.main_key], self.group_size):
-            items = list(item)
-            data_columns = [[] for l in  range(len(data_maps))]
-
-            for x in item:
-                for index, key in enumerate(self.keys):
-                    data_columns[index].append(data_maps[key][x])
-
-            for row in data_columns:
-                items.extend(row)
-
-            results.append(items)
-
-        return pd.DataFrame(results)
+ufc_groups = {
+    "group_num_1" : 1,
+    "amount_num_1" : 1,
+    #"group_num_2" : 2,
+    #"amount_num_2" : 1,
+    #"group_num_3" : 3,
+    #"amount_num_3": 1,
+    "column_order" : [0,1,2,3,4,5,
+                '0 Salary','1 Salary','2 Salary','3 Salary','4 Salary','5 Salary', '0 Fight', '1 Fight',
+                '2 Fight', '3 Fight', '4 Fight', '5 Fight',
+                '0 Group','1 Group','2 Group','3 Group','4 Group','5 Group',
+                'DK Total Salary']
+}
 
 class Formater(object):
     """
@@ -97,36 +90,44 @@ class Formater(object):
     def get_dataframe(self):
         return self.df
 
-MMA_DK = {
-    "group_size" : 6,
-    "main_key" : "Name + ID",
-    "keys" : ["Salary", "Fight", "Group"],
-    "columns": {6: '0 Salary', 7: '1 Salary', 8: '2 Salary',
-                9: '3 Salary', 10: '4 Salary', 11: '5 Salary',
-                12: '0 Fight', 13: '1 Fight', 14: '2 Fight',
-                15: '3 Fight', 16: '4 Fight', 17: '5 Fight',
-                18: '0 Group', 19: '1 Group', 20: '2 Group',
-                21: '3 Group', 22: '4 Group', 23: '5 Group'
-                },
-    "extra_columns":[('DK Total Salary', 'Salary')],
-    "filters":[('DK Total Salary', 50000, 'le'), ('DK Total Salary', 49500, 'ge')],
-    "sort": 'DK Total Salary',
-    "isUFC": True
-    }
+class Combinations(object):
+    """
+    Creates different combinations using data in a dataframe
+    """
+    def __init__(self, dataframe, choice):
+        self.dataframe = dataframe
+        self.choice = choice
+        self.group_size = choice['group_size']
+        self.main_key = choice['main_key']
+        self.keys = choice['keys']
 
-ufc_groups = {
-    "group_num_1" : 1,
-    "amount_num_1" : 1,
-    #"group_num_2" : 2,
-    #"amount_num_2" : 1,
-    #"group_num_3" : 3,
-    #"amount_num_3": 1,
-    "column_order" : [0,1,2,3,4,5,
-                '0 Salary','1 Salary','2 Salary','3 Salary','4 Salary','5 Salary', '0 Fight', '1 Fight',
-                '2 Fight', '3 Fight', '4 Fight', '5 Fight',
-                '0 Group','1 Group','2 Group','3 Group','4 Group','5 Group',
-                'DK Total Salary']
-}
+    def _build_maps(self):
+        out_dict = {}
+        for key in self.keys:
+            temp_dict = {}
+            for index, row in enumerate(self.dataframe[self.main_key]):
+                temp_dict.update({row: self.dataframe[key][index]})
+            out_dict.update({key: temp_dict})
+        return out_dict
+
+    def combine(self):
+        results = []
+        data_maps = self._build_maps()
+        for  item in it.combinations(self.dataframe[self.main_key], self.group_size):
+            items = list(item)
+            data_columns = [[] for l in  range(len(data_maps))]
+
+            for x in item:
+                for index, key in enumerate(self.keys):
+                    data_columns[index].append(data_maps[key][x])
+
+            for row in data_columns:
+                items.extend(row)
+
+            results.append(items)
+
+        return pd.DataFrame(results)
+        
 def download_link(object_to_download, download_filename, download_link_text):
     """
     Generates a link to download the given object_to_download.
